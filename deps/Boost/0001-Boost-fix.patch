@@ -8,6 +8,7 @@ Subject: [PATCH] FIX: limit_handles
  boost/process/detail/posix/pipe_out.hpp  | 13 +++++++++++--
  boost/process/detail/used_handles.hpp    |  3 +++
  boost/process/detail/windows/handles.hpp | 10 +++++++---
+ tools/build/src/tools/msvc.jam           | 10 +++++++++-
  4 files changed, 24 insertions(+), 6 deletions(-)
 
 diff --git a/boost/process/detail/posix/executor.hpp b/boost/process/detail/posix/executor.hpp
@@ -120,6 +121,27 @@ index 7a93ac2..f120ef7 100644
  
          auto part_itr = std::partition(all_handles.begin(), all_handles.end(),
                                         [](::boost::winapi::HANDLE_ handle) {return handle != ::boost::winapi::INVALID_HANDLE_VALUE_;});
+diff --git a/tools/build/src/tools/msvc.jam b/tools/build/src/tools/msvc.jam
+index 685af85fa..03fd4d10a 100644
+--- a/tools/build/src/tools/msvc.jam
++++ b/tools/build/src/tools/msvc.jam
+@@ -1113,7 +1113,15 @@ local rule generate-setup-cmd ( version : command : parent : options * : cpu : g
+         }
+         else
+         {
+-            if [ MATCH "(14.3)" : $(version) ]
++            if [ MATCH "(14.4)" : $(version) ]
++            {
++                if $(.debug-configuration)
++                {
++                    ECHO "notice: [generate-setup-cmd] $(version) is 14.4x" ;
++                }
++                parent = [ path.native [ path.join  $(parent) "..\\..\\..\\..\\..\\Auxiliary\\Build" ] ] ;
++            }
++            else if [ MATCH "(14.3)" : $(version) ]
+             {
+                 if $(.debug-configuration)
+                 {
 -- 
 2.36.1.windows.1
 
